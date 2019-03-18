@@ -63,7 +63,7 @@ def main():
         if mission_id is not -1:
             loginfo.log_info("task start")
             child = subprocess.Popen(['/usr/local/bin/python2', 'run.py', '%d' % mission_id], shell=False,
-                                     stdout=log_fd, stderr=log_fd, cwd=autoqps_path)
+                                     stdout=log_fd, stderr=log_fd, cwd=auto_path)
             task_list[mission_id] = child
         cancel_id = get_cancel_id(cursor, loginfo)
         if cancel_id is -1:

@@ -9,6 +9,8 @@ database_user="root"
 database_pass="noSafeNoWork@2019"
 local_ip='10.141.177.27'
 
+auto_path = "/search/odin/test/gongyanli/picEval"
+
 #    path, start_script, port
 
 MOD_BASE=[('/search/odin/test/offline/tf_ocr_daemon','restart_tf_ocr_daemon.sh',4101),
