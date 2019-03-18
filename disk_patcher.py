@@ -15,7 +15,7 @@ database_table = "picEval_imagetaskinfo"
 database_user = "root"
 database_pass = "noSafeNoWork@2019"
 
-server_nodes = ['10.141.177.27']
+server_nodes = ['10.141.21.129']
 
 
 def check_new_task(cursor):

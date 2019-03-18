@@ -53,6 +53,7 @@ def main():
         cursor = db.cursor()
         time.sleep(2)
         running_id = get_running_id(cursor, loginfo);
+        print(running_id)
         if (running_id != -1):
             continue
         for (k, v) in task_list.items():
