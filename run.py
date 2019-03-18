@@ -7,7 +7,7 @@ import os, sys, json,time
 import pymysql
 from lib import logUtils
 import lauch
-from imgconf import *
+from imgconf1 import *
 from Editdistance import *
 
 # from picEval.models import ImageTaskInfo, ResultInfo
