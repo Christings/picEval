@@ -20,4 +20,4 @@ rootpath = r'/search/odin/daemon/evalpaltform/demo_pro'
 origin_secpath = r'/static/origin/'
 dest_secpath = r'/static/dest/'
 
-auto_path = "/search/odin/test/gongyanli/picEval"
+auto_path = "/search/odin/daemon/evalpaltform/picEval"
