@@ -4,7 +4,7 @@ import subprocess
 import pymysql
 import time
 from lib import logUtils
-from qoconf import *
+from imgconf import *
 
 # db = pymysql.connect(database_host,database_user,database_pass,database_data)
 # cursor = db.cursor()

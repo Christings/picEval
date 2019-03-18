@@ -1,9 +1,13 @@
 #! /usr/bin/env python
 #coding=utf-8
+
 database_host="10.141.21.129"
 database_data="evalplatform"
+database_table="picEval_imagetaskinfo"
 database_user="root"
 database_pass="noSafeNoWork@2019"
+local_ip='10.141.177.27'
+
 #    path, start_script, port
 
 MOD_BASE=[('/search/odin/test/offline/tf_ocr_daemon','restart_tf_ocr_daemon.sh',4101),
