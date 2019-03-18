@@ -109,7 +109,7 @@ def post_ocr():
     env_type = db_data[2]
     status = db_data[3]
 
-    remote_path = '/search/odin/test/gongyanli/picEval'
+    remote_path = '/search/odin/test/gongyanli/picEval/'
 
     # ssh登录，启动环境
     cmds_base1 = "python " + remote_path + "%s %d" % ('start.py', mission_id)
