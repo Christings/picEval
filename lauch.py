@@ -2,7 +2,7 @@
 # coding=utf-8
 
 import paramiko
-import logUtils
+from lib import logUtils
 import sys,time
 
 
