@@ -3,13 +3,12 @@
 
 import requests
 import base64
-import os, sys, json
+import os, sys, json,time
 import pymysql
-import logUtils
+from lib import logUtils
 import lauch
 from imgconf import *
 from Editdistance import *
-from mytime import *
 
 # from picEval.models import ImageTaskInfo, ResultInfo
 
@@ -40,6 +39,9 @@ url_pic_test = "http://10.141.177.27:3111/v1/ocr_translate.json"
 url_ocr_base = "http://10.141.177.27:32013/v1/ocr/basic.json"
 url_pic_base = "http://10.141.177.27:5124/v1/ocr_translate.json"
 
+def get_now_time():
+    timeArray = time.localtime()
+    return time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
 
 def update_errorlog(log):
     logstr = logUtils.logutil(mission_id)

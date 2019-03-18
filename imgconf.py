@@ -4,6 +4,7 @@
 database_host="10.141.21.129"
 database_data="evalplatform"
 database_table="picEval_imagetaskinfo"
+database_image="picEval_imagetaskinfo"
 database_user="root"
 database_pass="noSafeNoWork@2019"
 local_ip='10.141.177.27'
