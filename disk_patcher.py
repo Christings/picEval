@@ -7,13 +7,13 @@ from lib import logUtils
 # status：任务的状态（0:未开始；1:已分配；2正在运行；3:出错停止；4:已完成；5:任务取消；6:准备取消；7:端口评测的状态）
 
 # database_host = "127.0.0.1"
-database_host = "10.134.120.30"
-database_data = "demo_pro"
+database_host = "10.141.21.129"
+database_data = "evalplatform"
 database_table = "picEval_imagetaskinfo"
 database_user = "root"
-database_pass = "Websearch@qa66"
+database_pass = "noSafeNoWork@2019"
 
-server_nodes = ['10.144.82.27']
+server_nodes = ['10.141.177.27']
 
 
 def check_new_task(cursor):

@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 #coding=utf-8
-database_host="10.134.120.30"
-database_data="demo_pro"
+database_host="10.141.21.129"
+database_data="evalplatform"
 database_user="root"
-database_pass="Websearch@qa66"
+database_pass="noSafeNoWork@2019"
 #    path, start_script, port
 
 MOD_BASE=[('/search/odin/test/offline/tf_ocr_daemon','restart_tf_ocr_daemon.sh',4101),
