@@ -8,7 +8,8 @@ database_image="picEval_imagetaskinfo"
 database_result = "picEval_resultinfo"
 database_user="root"
 database_pass="noSafeNoWork@2019"
-local_ip='10.141.177.27'
+local_ip='10.141.21.129'
+
 
 # 远端启动
 ip = "10.141.177.27"
