@@ -19,7 +19,7 @@ server_nodes = ['10.141.177.27']
 
 
 def check_new_task(cursor):
-    cursor.execute("SELECT id FROM {_table} where status=0 ORDER BY create_time limit 1".format(_table=database_table))
+    cursor.execute("SELECT id FROM {_table} where status=0 ORDER BY start_time limit 1".format(_table=database_table))
     data = cursor.fetchone()
     if data == None:
         return -1
