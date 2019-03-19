@@ -174,8 +174,8 @@ def post_ocr():
                         rankInfo = distance_data['sum_distance']
                         result = json.dumps(distance_data['result'])
 
-                        test_Img1, testpath = post_image(lang, from_langs, to_langs, base64image,url_pic_test,filename, 'test')
-                        test_Img2, basepath = post_image(lang, from_langs, to_langs, base64image,url_pic_base,filename, 'base')
+                        test_Img1, testpath = post_image(lang, from_langs, to_langs, base64image,url_pic_test,filename, 'test',mission_id)
+                        test_Img2, basepath = post_image(lang, from_langs, to_langs, base64image,url_pic_base,filename, 'base',mission_id)
 
                         sql_result = "INSERT INTO  %s(taskid_id,rankInfo,result,testImg,basepath,testpath,test_status,base_status,filename) values('%d','%d','%s','%s','%s','%s','%d','%d','%s')" % (
                             database_result, mission_id, rankInfo, pymysql.escape_string(result), test_Img1, basepath,
@@ -208,7 +208,7 @@ def post_ocr():
     return 0
 
 
-def post_image(lang, from_langs, to_langs, base64image, url, filename, type):
+def post_image(lang, from_langs, to_langs, base64image, url, filename, type,mission_id):
     params_img = {
         'from': from_langs,
         'to': to_langs,
@@ -229,8 +229,8 @@ def post_image(lang, from_langs, to_langs, base64image, url, filename, type):
 
         filename = filename[:-4]
 
-        isPath = rootpath + dest_secpath + mission_id + '/'+lang + '/' + filename + '/'
-        storePath = dest_secpath + mission_id + '/' + lang + '/' + filename + '/'
+        isPath = rootpath + dest_secpath + mission_id +'/'+ lang + '/' + filename + '/'
+        storePath = dest_secpath + lang + '/' + filename + '/'
         if not os.path.exists(isPath):
             os.makedirs(isPath)
         if type == 'test':
