@@ -5,6 +5,7 @@ import pymysql
 import time
 from lib import logUtils
 from imgconf1 import *
+import signal
 
 # db = pymysql.connect(database_host,database_user,database_pass,database_data)
 # cursor = db.cursor()
@@ -81,6 +82,15 @@ def main():
                 db.commit()
             except:
                 db.rollback()
+
+def sig_handler(sig, frame):
+    update_errorlog("[%s] task %d has been canceled\n" % (get_now_time(), mission_id))
+    set_status(5)
+    sys.exit()
+
+
+signal.signal(10, sig_handler)
+signal.signal(15, sig_handler)
 
 
 if __name__ == '__main__':
