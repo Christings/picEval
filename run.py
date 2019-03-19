@@ -229,8 +229,8 @@ def post_image(lang, from_langs, to_langs, base64image, url, filename, type):
 
         filename = filename[:-4]
 
-        isPath = rootpath + dest_secpath + lang + '/' + filename + '/'
-        storePath = dest_secpath + lang + '/' + filename + '/'
+        isPath = rootpath + dest_secpath + mission_id + '/'+lang + '/' + filename + '/'
+        storePath = dest_secpath + mission_id + '/' + lang + '/' + filename + '/'
         if not os.path.exists(isPath):
             os.makedirs(isPath)
         if type == 'test':
