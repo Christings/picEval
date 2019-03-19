@@ -61,7 +61,7 @@ def update_errorlog(log):
 
 
 def set_status(status):
-    sql = "UPDATE %s set status=%d, end_time='%s' where id=%d" % (database_image, status, get_now_time(), mission_id)
+    sql = "UPDATE %s set status=%d, start_time='%s' where id=%d" % (database_image, status, get_now_time(), mission_id)
     try:
         cursor.execute(sql)
         db.commit()
@@ -92,6 +92,7 @@ def imageTobase64(path):
 
 def post_ocr():
     set_status(2)
+
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
     }
@@ -139,8 +140,7 @@ def post_ocr():
             if out2 == 'switch_langs':
                 update_errorlog("[%s] Switch Language [%s] successfully. \n" % (get_now_time(), lang))
 
-               # set_status(2)
-
+                # set_status(2)
 
                 sum_num += len(os.listdir(rootpath + origin_secpath + lang + '/'))
 
