@@ -91,6 +91,7 @@ def imageTobase64(path):
 
 
 def post_ocr():
+    set_status(2)
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
     }
@@ -133,12 +134,12 @@ def post_ocr():
             out2 = out2[-1].strip('\n').strip("'")
 
 
-            set_status(1)
+            # set_status(1)
 
             if out2 == 'switch_langs':
                 update_errorlog("[%s] Switch Language [%s] successfully. \n" % (get_now_time(), lang))
 
-                set_status(2)
+               # set_status(2)
 
 
                 sum_num += len(os.listdir(rootpath + origin_secpath + lang + '/'))
