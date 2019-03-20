@@ -168,6 +168,10 @@ def post_ocr():
                     ocr_test = resp_test.json()
                     ocr_base = resp_base.json()
 
+                    if not os.path.exists(isStorePathExists):
+                        os.makedirs(isStorePathExists)
+                    update_errorlog("[%s] [%s] success. \n" % (get_now_time(), isStorePathExists))
+
                     store_base=open(storePath+filename+'_base.json','w')
                     store_base.write(ocr_base)
                     store_base.close()
