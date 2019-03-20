@@ -3,7 +3,7 @@
 
 import requests
 import base64
-import os, sys, json,time
+import os, sys, json, time
 import pymysql
 from lib import logUtils
 import lauch
@@ -39,9 +39,11 @@ url_pic_test = "http://10.141.177.27:3111/v1/ocr_translate.json"
 url_ocr_base = "http://10.141.177.27:32013/v1/ocr/basic.json"
 url_pic_base = "http://10.141.177.27:5124/v1/ocr_translate.json"
 
+
 def get_now_time():
     timeArray = time.localtime()
     return time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+
 
 def update_errorlog(log):
     logstr = logUtils.logutil(mission_id)
@@ -96,7 +98,7 @@ def post_ocr():
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
     }
-    id=mission_id
+    id = mission_id
     sum_num = 0
 
     failed = 0
@@ -113,10 +115,6 @@ def post_ocr():
 
     remote_path = '/search/odin/test/gongyanli/picEval/'
 
-
-
-
-
     # ssh登录，启动环境
     cmds_base1 = "python " + remote_path + "%s %d" % ('start.py', mission_id)
     out1, err1 = lauch.startsh(ip, user, pwd, cmds_base1)
@@ -132,12 +130,10 @@ def post_ocr():
             from_langs = temp[0]
             to_langs = temp[1]
 
-
             # ssh登录，切换语言
             cmds_base2 = "python " + remote_path + "%s %s %d" % ('switch_lang.py', from_langs, mission_id)
             out2, err2 = lauch.startsh(ip, user, pwd, cmds_base2)
             out2 = out2[-1].strip('\n').strip("'")
-
 
             # set_status(1)
 
@@ -156,7 +152,6 @@ def post_ocr():
                     storePath = dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
                     update_errorlog("[%s] path [%s] [%s]. \n" % (get_now_time(), isStorePathExists, storePath))
 
-
                     base64image = imageTobase64(rootpath + origin_secpath + lang + '/' + filename)
                     params_ocr = {
                         'lang': from_langs,
@@ -172,7 +167,8 @@ def post_ocr():
                         os.makedirs(isStorePathExists)
                     update_errorlog("[%s] [%s] success. \n" % (get_now_time(), isStorePathExists))
 
-                    with open(isStorePathExists+'base.json','w') as store_base,open(isStorePathExists+'test.json','w') as store_test:
+                    with open(isStorePathExists + 'base.json', 'w') as store_base, open(isStorePathExists + 'test.json',
+                                                                                        'w') as store_test:
                         store_base.write(json.dumps(ocr_base))
                         store_test.write(json.dumps(ocr_test))
                         update_errorlog("[%s] insert success. \n" % (get_now_time()))
@@ -193,8 +189,10 @@ def post_ocr():
                         rankInfo = distance_data['sum_distance']
                         result = json.dumps(distance_data['result'])
 
-                        test_Img1, testpath = post_image(lang, from_langs, to_langs, base64image,url_pic_test,filename, 'test',mission_id)
-                        test_Img2, basepath = post_image(lang, from_langs, to_langs, base64image,url_pic_base,filename, 'base',mission_id)
+                        test_Img1, testpath = post_image(lang, from_langs, to_langs, base64image, url_pic_test,
+                                                         filename, 'test', isStorePathExists, storePath)
+                        test_Img2, basepath = post_image(lang, from_langs, to_langs, base64image, url_pic_base,
+                                                         filename, 'base', isStorePathExists, storePath)
 
                         sql_result = "INSERT INTO  %s(taskid_id,rankInfo,result,testImg,basepath,testpath,test_status,base_status,filename) values('%d','%d','%s','%s','%s','%s','%d','%d','%s')" % (
                             database_result, mission_id, rankInfo, pymysql.escape_string(result), test_Img1, basepath,
@@ -206,9 +204,10 @@ def post_ocr():
                     else:
                         failed += 1
 
-                sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d',status=4 where id=%d" % (
+                path = rootpath + dest_secpath + str(mission_id)
+                sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d',status=4 ,path='%s' where id=%d" % (
                     database_image, get_now_time(), sum_num, finished, failed, img_diff_count, text_diff_count,
-                    text_base_count,
+                    text_base_count, path,
                     mission_id)
 
                 cursor.execute(sql_image)
@@ -227,7 +226,7 @@ def post_ocr():
     return 0
 
 
-def post_image(lang, from_langs, to_langs, base64image, url, filename, type,mission_id):
+def post_image(lang, from_langs, to_langs, base64image, url, filename, type, isStorePathExists, storePath):
     params_img = {
         'from': from_langs,
         'to': to_langs,
@@ -246,26 +245,26 @@ def post_image(lang, from_langs, to_langs, base64image, url, filename, type,miss
         pic = result['pic']
         pic = base64.b64decode(pic)
 
-        filename = filename[:-4]
+        # filename = filename[:-4]
 
-        isPath = rootpath + dest_secpath + str(mission_id) +'/'+ lang + '/' + filename + '/'
-        storePath = dest_secpath + str(mission_id)+'/'+lang + '/' + filename + '/'
-        update_errorlog("[%s] [%s] path. \n" % (get_now_time(), isPath))
-
-        if not os.path.exists(isPath):
-            os.makedirs(isPath)
-        update_errorlog("[%s] [%s] success. \n" % (get_now_time(), storePath))
+        # isPath = rootpath + dest_secpath + str(mission_id) + '/' + lang + '/' + filename + '/'
+        # storePath = dest_secpath + str(mission_id) + '/' + lang + '/' + filename + '/'
+        # update_errorlog("[%s] [%s] path. \n" % (get_now_time(), isPath))
+        #
+        # if not os.path.exists(isPath):
+        #     os.makedirs(isPath)
+        # update_errorlog("[%s] [%s] success. \n" % (get_now_time(), storePath))
 
         if type == 'test':
 
-            file = open(isPath + filename + '_test.jpg', 'wb')
-            path = storePath + filename + '_test.jpg'
+            file = open(isStorePathExists  + 'test.jpg', 'wb')
+            path = storePath  + 'test.jpg'
             file.write(pic)
             # ResultInfo.objects.filter(id=ResultInfo_id).update(testpath=path)
             file.close()
         elif type == 'base':
-            file = open(isPath + filename + '_base.jpg', 'wb')
-            path = storePath + filename + '_base.jpg'
+            file = open(isStorePathExists  + 'base.jpg', 'wb')
+            path = storePath  + 'base.jpg'
             file.write(pic)
             # ResultInfo.objects.filter(id=ResultInfo_id).update(basepath=path)
             file.close()
