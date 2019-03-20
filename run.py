@@ -96,7 +96,7 @@ def post_ocr():
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
     }
-
+    id=mission_id
     sum_num = 0
 
     failed = 0
@@ -112,6 +112,10 @@ def post_ocr():
     status = db_data[3]
 
     remote_path = '/search/odin/test/gongyanli/picEval/'
+
+
+
+
 
     # ssh登录，启动环境
     cmds_base1 = "python " + remote_path + "%s %d" % ('start.py', mission_id)
@@ -147,6 +151,12 @@ def post_ocr():
                 update_errorlog("[%s] Post is running. \n" % (get_now_time()))
 
                 for filename in os.listdir(rootpath + origin_secpath + lang + '/'):
+
+                    isStorePathExists = rootpath + dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
+                    storePath = dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
+                    update_errorlog("[%s] path [%s] [%s]. \n" % (get_now_time(), isStorePathExists, storePath))
+
+
                     base64image = imageTobase64(rootpath + origin_secpath + lang + '/' + filename)
                     params_ocr = {
                         'lang': from_langs,
@@ -157,6 +167,11 @@ def post_ocr():
 
                     ocr_test = resp_test.json()
                     ocr_base = resp_base.json()
+
+                    store_base=open(storePath+filename+'_base.json','w')
+                    store_base.write(store_base)
+                    store_base.close()
+
 
                     test_issuccess = ocr_test['success']
                     base_issuccess = ocr_base['success']
