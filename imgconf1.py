@@ -20,6 +20,6 @@ pwd = "gpufirst@123"
 # rootpath = r'/search/odin/daemon/evalpaltform/demo_pro'
 rootpath = r'/search/odin/daemon'
 origin_secpath = r'/static/origin/'
-dest_secpath = r'/static/dest/'
+dest_secpath = r'/static/dest/deploy/'
 
 auto_path = "/search/odin/daemon/evalpaltform/picEval"
