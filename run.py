@@ -231,8 +231,12 @@ def post_image(lang, from_langs, to_langs, base64image, url, filename, type,miss
 
         isPath = rootpath + dest_secpath + mission_id +'/'+ lang + '/' + filename + '/'
         storePath = dest_secpath + lang + '/' + filename + '/'
+        update_errorlog("[%s] [%s] path. \n" % (get_now_time(), isPath))
+
         if not os.path.exists(isPath):
             os.makedirs(isPath)
+        update_errorlog("[%s] [%s] success. \n" % (get_now_time(), storePath))
+
         if type == 'test':
 
             file = open(isPath + filename + '_test.jpg', 'wb')
