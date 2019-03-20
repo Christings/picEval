@@ -169,7 +169,7 @@ def post_ocr():
                     ocr_base = resp_base.json()
 
                     store_base=open(storePath+filename+'_base.json','w')
-                    store_base.write(store_base)
+                    store_base.write(ocr_base)
                     store_base.close()
 
 
