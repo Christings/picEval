@@ -172,14 +172,10 @@ def post_ocr():
                         os.makedirs(isStorePathExists)
                     update_errorlog("[%s] [%s] success. \n" % (get_now_time(), isStorePathExists))
 
-                    # store_base=open(isStorePathExists+filename+'_base.json','w')
-                    # store_base.write(ocr_base)
-                    # store_base.close()
-
-                    with open(isStorePathExists+filename+'_base.txt','w') as store_base,open(isStorePathExists+filename+'_base.json','w') as store_test:
-                        store_base.write('b')
-                        store_test.write(json.dumps(ocr_base))
-                        update_errorlog("[%s] [%s] insert success. \n" % (get_now_time()))
+                    with open(isStorePathExists+'base.json','w') as store_base,open(isStorePathExists+'test.json','w') as store_test:
+                        store_base.write(json.dumps(ocr_base))
+                        store_test.write(json.dumps(ocr_test))
+                        update_errorlog("[%s] insert success. \n" % (get_now_time()))
 
                     test_issuccess = ocr_test['success']
                     base_issuccess = ocr_base['success']
