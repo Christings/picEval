@@ -182,8 +182,11 @@ def post_ocr():
                         # 计算距离
                         distance_data = json.loads(ReturnRes(ocr_test, ocr_base))
 
-                        img_diff_count += distance_data['img_diff_count']
+                        if distance_data['img_diff_count'] != int(0):
+                            img_diff_count += 1
+
                         text_diff_count += distance_data['text_diff_count']
+
                         text_base_count += distance_data['text_base_count']
 
                         rankInfo = distance_data['sum_distance']
