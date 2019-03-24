@@ -178,6 +178,7 @@ def post_ocr():
                     params_ocr = {
                         'lang': from_langs,
                         'image': base64image,
+                        'direction_detect': 'true'
                     }
                     resp_test = requests.post(url_ocr_test, data=params_ocr, headers=headers)
                     resp_base = requests.post(url_ocr_base, data=params_ocr, headers=headers)
