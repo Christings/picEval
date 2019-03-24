@@ -84,6 +84,28 @@ def get_imagetaskinfo():
 
     return data
 
+def insert_imageTaskInfo(sum_num,finished,failed,img_diff_count,text_diff_count,text_base_count,path):
+    sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d',status=4 ,path='%s' where id=%d" % (
+        database_image, get_now_time(), sum_num, finished, failed, img_diff_count, text_diff_count,text_base_count, path,mission_id)
+
+    try:
+        cursor.execute(sql_image)
+        db.commit()
+    except Exception as e:
+        pass
+    return 0
+
+def insert_resultInfo(rankInfo,result,test_Img1,basepath,testpath,test_issuccess,base_issuccess,filename):
+    sql_result = "INSERT INTO  %s(taskid_id,rankInfo,result,testImg,basepath,testpath,test_status,base_status,filename) values('%d','%d','%s','%s','%s','%s','%d','%d','%s')" % (
+                            database_result, mission_id, rankInfo, pymysql.escape_string(result), test_Img1, basepath,
+                            testpath, test_issuccess, base_issuccess, filename)
+    try:
+        cursor.execute(sql_result)
+        db.commit()
+    except Exception as e:
+        pass
+    return 0
+
 
 def imageTobase64(path):
     with open(path, 'rb') as f:
@@ -197,24 +219,29 @@ def post_ocr():
                         test_Img2, basepath = post_image(lang, from_langs, to_langs, base64image, url_pic_base,
                                                          filename, 'base', isStorePathExists, storePath)
 
-                        sql_result = "INSERT INTO  %s(taskid_id,rankInfo,result,testImg,basepath,testpath,test_status,base_status,filename) values('%d','%d','%s','%s','%s','%s','%d','%d','%s')" % (
-                            database_result, mission_id, rankInfo, pymysql.escape_string(result), test_Img1, basepath,
-                            testpath, test_issuccess, base_issuccess, filename)
+                        insert_resultInfo(rankInfo, result, test_Img1, basepath, testpath, test_issuccess,
+                                          base_issuccess, filename)
+                        # sql_result = "INSERT INTO  %s(taskid_id,rankInfo,result,testImg,basepath,testpath,test_status,base_status,filename) values('%d','%d','%s','%s','%s','%s','%d','%d','%s')" % (
+                        #     database_result, mission_id, rankInfo, pymysql.escape_string(result), test_Img1, basepath,
+                        #     testpath, test_issuccess, base_issuccess, filename)
+                        #
+                        # cursor.execute(sql_result)
+                        # db.commit()
 
-                        cursor.execute(sql_result)
-                        db.commit()
+                        path = rootpath + dest_secpath + str(mission_id)
+                        insert_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count,text_base_count, path)
 
                     else:
                         failed += 1
 
-                path = rootpath + dest_secpath + str(mission_id)
-                sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d',status=4 ,path='%s' where id=%d" % (
-                    database_image, get_now_time(), sum_num, finished, failed, img_diff_count, text_diff_count,
-                    text_base_count, path,
-                    mission_id)
-
-                cursor.execute(sql_image)
-                db.commit()
+                # path = rootpath + dest_secpath + str(mission_id)
+                # sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d',status=4 ,path='%s' where id=%d" % (
+                #     database_image, get_now_time(), sum_num, finished, failed, img_diff_count, text_diff_count,
+                #     text_base_count, path,
+                #     mission_id)
+                #
+                # cursor.execute(sql_image)
+                # db.commit()
 
                 status_data = get_imagetaskinfo()
                 if status_data[3] == 4:
