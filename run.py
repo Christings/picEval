@@ -62,8 +62,17 @@ def update_errorlog(log):
     return data
 
 
-def set_status(status):
+def set_startStatus(status):
     sql = "UPDATE %s set status=%d, start_time='%s' where id=%d" % (database_image, status, get_now_time(), mission_id)
+    try:
+        cursor.execute(sql)
+        db.commit()
+    except Exception as e:
+        update_errorlog("[%s] update task status failed, the status code is [%d]. \n" % (get_now_time(), status))
+    return 0
+
+def set_endStatus(status):
+    sql = "UPDATE %s set status=%d, end_time='%s' where id=%d" % (database_image, status, get_now_time(), mission_id)
     try:
         cursor.execute(sql)
         db.commit()
@@ -85,7 +94,7 @@ def get_imagetaskinfo():
     return data
 
 def update_imageTaskInfo(sum_num,finished,failed,img_diff_count,text_diff_count,text_base_count,path):
-    sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d',status=4 ,path='%s' where id=%d" % (
+    sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d' ,path='%s' where id=%d" % (
         database_image, get_now_time(), sum_num, finished, failed, img_diff_count, text_diff_count,text_base_count, path,mission_id)
 
     try:
@@ -115,7 +124,7 @@ def imageTobase64(path):
 
 
 def post_ocr():
-    set_status(2)
+    set_startStatus(2)
 
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
@@ -241,6 +250,7 @@ def post_ocr():
                 #
                 # cursor.execute(sql_image)
                 # db.commit()
+                set_endStatus(4)
 
                 status_data = get_imagetaskinfo()
                 if status_data[3] == 4:
