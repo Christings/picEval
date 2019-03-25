@@ -104,7 +104,7 @@ def GetEditDistance(test_res_info,base_res_info,match_list):
     res=[]
     data={}
     for i,j in match_list:
-    	res_member={}
+        res_member={}
         test_str=test_res_info[i][0]
         base_str=base_res_info[j][0]
         edit_distance=Distance(test_str,base_str)
