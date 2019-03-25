@@ -129,7 +129,6 @@ def post_ocr():
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
     }
-    id = mission_id
     sum_num = 0
 
     failed = 0
@@ -241,6 +240,8 @@ def post_ocr():
 
                     else:
                         failed += 1
+                        insert_resultInfo(rankInfo=0, result='', test_Img1=origin_secpath + from_langs + '/' + filename, basepath='null', testpath='null', test_issuccess=0,
+                                      base_issuccess=0, filename=filename)
 
                 # path = rootpath + dest_secpath + str(mission_id)
                 # sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d',status=4 ,path='%s' where id=%d" % (
