@@ -267,7 +267,7 @@ def post_image(lang, from_langs, to_langs, base64image, url, filename, type, isS
     resp = requests.post(url, data=params_img)
     result = resp.json()
 
-    testImg = origin_secpath + lang + '/' + filename
+    testImg = origin_secpath + from_langs + '/' + filename
     path = ''
 
     if result['success'] == int(1):
