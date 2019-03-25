@@ -147,7 +147,7 @@ def GetEditDistance(test_res_info,base_res_info,match_list):
             res_member['distance']=edit_distance
             res.append(res_member)
     data["img_diff_count"]=img_diff
-    data["test_base_count"]=base_cont_count
+    data["text_base_count"]=base_cont_count
     data["text_diff_count"]=text_diff
     data["sum_distance"]=sum_distance
     data["result"]=res
