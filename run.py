@@ -169,7 +169,7 @@ def post_ocr():
                 update_errorlog("[%s] Env Deploy: The post is running. \n" % (get_now_time()))
 
                 path = rootpath + dest_secpath + str(mission_id)
-                for filename in os.listdir(rootpath + origin_secpath + lang + '/'):
+                for filename in os.listdir(rootpath + origin_secpath + from_langs + '/'):
 
                     isStorePathExists = rootpath + dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
                     storePath = dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
@@ -244,7 +244,7 @@ def post_ocr():
 
                 status_data = get_imagetaskinfo()
                 if status_data[3] == 4:
-                    update_errorlog("[%s] Post [%s] has been completed. \n" % (get_now_time(), lang))
+                    update_errorlog("[%s] Env deploy: The post [%s] has been completed. \n" % (get_now_time(), lang))
                     continue
 
             else:
