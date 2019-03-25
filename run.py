@@ -61,6 +61,14 @@ def update_errorlog(log):
         logstr.log_debug("update_errorlog failed.")
     return data
 
+def set_pid(pid):
+    sql = "UPDATE %s set pid='%s' where id=%d" % (database_image,pid,mission_id)
+    try:
+        cursor.execute(sql)
+        db.commit()
+    except Exception as e:
+        update_errorlog("[%s] Insert pid failed. \n" % (get_now_time()))
+    return 0
 
 def set_startStatus(status):
     sql = "UPDATE %s set status=%d, start_time='%s' where id=%d" % (database_image, status, get_now_time(), mission_id)
@@ -198,8 +206,7 @@ def post_ocr():
                     if not os.path.exists(isStorePathExists):
                         os.makedirs(isStorePathExists)
 
-                    with open(isStorePathExists + 'base.json', 'w') as store_base, open(isStorePathExists + 'test.json',
-                                                                                        'w') as store_test:
+                    with open(isStorePathExists + 'base.json', 'w') as store_base, open(isStorePathExists + 'test.json','w') as store_test:
                         store_base.write(json.dumps(ocr_base))
                         store_test.write(json.dumps(ocr_test))
                         update_errorlog("[%s] insert success. \n" % (get_now_time()))
@@ -321,4 +328,6 @@ if __name__ == '__main__':
     # post_ocr('http://api.image.sogou/v1/ocr/basic.json', 'http://api.image.sogou/v1/ocr/basic.json', 'zh-CHS')
     # post_image('en', 'zh-CHS', base64, filename, url, type)
     # get_material()
+    pid=os.getpid()
+    set_pid(pid)
     post_ocr()
