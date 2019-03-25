@@ -84,7 +84,7 @@ def get_imagetaskinfo():
 
     return data
 
-def insert_imageTaskInfo(sum_num,finished,failed,img_diff_count,text_diff_count,text_base_count,path):
+def update_imageTaskInfo(sum_num,finished,failed,img_diff_count,text_diff_count,text_base_count,path):
     sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d',status=4 ,path='%s' where id=%d" % (
         database_image, get_now_time(), sum_num, finished, failed, img_diff_count, text_diff_count,text_base_count, path,mission_id)
 
@@ -164,17 +164,18 @@ def post_ocr():
 
                 # set_status(2)
 
-                sum_num += len(os.listdir(rootpath + origin_secpath + lang + '/'))
+                sum_num += len(os.listdir(rootpath + origin_secpath + from_langs + '/'))
 
-                update_errorlog("[%s] Post is running. \n" % (get_now_time()))
+                update_errorlog("[%s] Env Deploy: The post is running. \n" % (get_now_time()))
 
+                path = rootpath + dest_secpath + str(mission_id)
                 for filename in os.listdir(rootpath + origin_secpath + lang + '/'):
 
                     isStorePathExists = rootpath + dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
                     storePath = dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
                     update_errorlog("[%s] path [%s] [%s]. \n" % (get_now_time(), isStorePathExists, storePath))
 
-                    base64image = imageTobase64(rootpath + origin_secpath + lang + '/' + filename)
+                    base64image = imageTobase64(rootpath + origin_secpath + from_langs + '/' + filename)
                     params_ocr = {
                         'lang': from_langs,
                         'image': base64image,
@@ -188,7 +189,6 @@ def post_ocr():
 
                     if not os.path.exists(isStorePathExists):
                         os.makedirs(isStorePathExists)
-                    update_errorlog("[%s] [%s] success. \n" % (get_now_time(), isStorePathExists))
 
                     with open(isStorePathExists + 'base.json', 'w') as store_base, open(isStorePathExists + 'test.json',
                                                                                         'w') as store_test:
@@ -209,7 +209,6 @@ def post_ocr():
                             img_diff_count += 1
 
                         text_diff_count += distance_data['text_diff_count']
-
                         text_base_count += distance_data['text_base_count']
 
                         rankInfo = distance_data['sum_distance']
@@ -229,8 +228,7 @@ def post_ocr():
                         # cursor.execute(sql_result)
                         # db.commit()
 
-                        path = rootpath + dest_secpath + str(mission_id)
-                        insert_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count,text_base_count, path)
+                        update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count,text_base_count, path)
 
                     else:
                         failed += 1
