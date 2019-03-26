@@ -278,7 +278,7 @@ def post_image(lang, from_langs, to_langs, base64image, url, filename, type, isS
         'from': from_langs,
         'to': to_langs,
         'image': base64image,
-        'result_type': 'image'
+        'result_type': 'text_image'
     }
 
     # resp = requests.post('http://api.image.sogou/v1/open/ocr_translate.json', data=params_img)
@@ -303,6 +303,8 @@ def post_image(lang, from_langs, to_langs, base64image, url, filename, type, isS
         # update_errorlog("[%s] [%s] success. \n" % (get_now_time(), storePath))
 
         if type == 'test':
+            with open(isStorePathExists + 'test_imgtrans.json', 'w') as store_test:
+                store_test.write(json.dumps(result))
 
             file = open(isStorePathExists  + 'test.jpg', 'wb')
             path = storePath  + 'test.jpg'
@@ -310,6 +312,9 @@ def post_image(lang, from_langs, to_langs, base64image, url, filename, type, isS
             # ResultInfo.objects.filter(id=ResultInfo_id).update(testpath=path)
             file.close()
         elif type == 'base':
+            with open(isStorePathExists + 'base_imgtrans.json', 'w') as store_base:
+                store_base.write(json.dumps(result))
+
             file = open(isStorePathExists  + 'base.jpg', 'wb')
             path = storePath  + 'base.jpg'
             file.write(pic)
