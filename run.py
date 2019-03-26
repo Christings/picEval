@@ -158,119 +158,123 @@ def post_ocr():
     out1, err1 = lauch.startsh(ip, user, pwd, cmds_base1)
     print(out1)
     print(err1)
-    out1 = out1[-1].strip('\n').strip("'")
+    if out1:
+        out1 = out1[-1].strip('\n').strip("'")
 
-    if out1 == 'env_success':
-        update_errorlog("[%s] SSH: lauch environment successfully. \n" % (get_now_time()))
+        if out1 == 'env_success':
+            update_errorlog("[%s] SSH: lauch environment successfully. \n" % (get_now_time()))
 
-        for lang in langs.split(','):
-            temp = lang.split('_')
-            from_langs = temp[0]
-            to_langs = temp[1]
+            for lang in langs.split(','):
+                temp = lang.split('_')
+                from_langs = temp[0]
+                to_langs = temp[1]
 
-            # ssh登录，切换语言
-            cmds_base2 = "python " + remote_path + "%s %s %d" % ('switch_lang.py', from_langs, mission_id)
-            out2, err2 = lauch.startsh(ip, user, pwd, cmds_base2)
-            out2 = out2[-1].strip('\n').strip("'")
+                # ssh登录，切换语言
+                cmds_base2 = "python " + remote_path + "%s %s %d" % ('switch_lang.py', from_langs, mission_id)
+                out2, err2 = lauch.startsh(ip, user, pwd, cmds_base2)
+                out2 = out2[-1].strip('\n').strip("'")
 
-            # set_status(1)
+                # set_status(1)
 
-            if out2 == 'switch_langs':
-                update_errorlog("[%s] Switch Language [%s] successfully. \n" % (get_now_time(), lang))
+                if out2 == 'switch_langs':
+                    update_errorlog("[%s] Switch Language [%s] successfully. \n" % (get_now_time(), lang))
 
-                # set_status(2)
+                    # set_status(2)
 
-                sum_num += len(os.listdir(rootpath + origin_secpath + from_langs + '/'))
+                    sum_num += len(os.listdir(rootpath + origin_secpath + from_langs + '/'))
 
-                update_errorlog("[%s] Env Deploy: The post is running. \n" % (get_now_time()))
+                    update_errorlog("[%s] Env Deploy: The post is running. \n" % (get_now_time()))
 
-                path = rootpath + dest_secpath + str(mission_id)
-                for filename in os.listdir(rootpath + origin_secpath + from_langs + '/'):
+                    path = rootpath + dest_secpath + str(mission_id)
+                    for filename in os.listdir(rootpath + origin_secpath + from_langs + '/'):
 
-                    isStorePathExists = rootpath + dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
-                    storePath = dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
-                    update_errorlog("[%s] path [%s] [%s]. \n" % (get_now_time(), isStorePathExists, storePath))
+                        isStorePathExists = rootpath + dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
+                        storePath = dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
+                        update_errorlog("[%s] path [%s] [%s]. \n" % (get_now_time(), isStorePathExists, storePath))
 
-                    base64image = imageTobase64(rootpath + origin_secpath + from_langs + '/' + filename)
-                    params_ocr = {
-                        'lang': from_langs,
-                        'image': base64image,
-                        'direction_detect': 'true'
-                    }
-                    resp_test = requests.post(url_ocr_test, data=params_ocr, headers=headers)
-                    resp_base = requests.post(url_ocr_base, data=params_ocr, headers=headers)
+                        base64image = imageTobase64(rootpath + origin_secpath + from_langs + '/' + filename)
+                        params_ocr = {
+                            'lang': from_langs,
+                            'image': base64image,
+                            'direction_detect': 'true'
+                        }
+                        resp_test = requests.post(url_ocr_test, data=params_ocr, headers=headers)
+                        resp_base = requests.post(url_ocr_base, data=params_ocr, headers=headers)
 
-                    ocr_test = resp_test.json()
-                    ocr_base = resp_base.json()
+                        ocr_test = resp_test.json()
+                        ocr_base = resp_base.json()
 
-                    if not os.path.exists(isStorePathExists):
-                        os.makedirs(isStorePathExists)
+                        if not os.path.exists(isStorePathExists):
+                            os.makedirs(isStorePathExists)
 
-                    with open(isStorePathExists + 'base_ocr.json', 'w') as store_base, open(isStorePathExists + 'test_ocr.json','w') as store_test:
-                        store_base.write(json.dumps(ocr_base))
-                        store_test.write(json.dumps(ocr_test))
-                        update_errorlog("[%s] insert success. \n" % (get_now_time()))
+                        with open(isStorePathExists + 'base_ocr.json', 'w') as store_base, open(isStorePathExists + 'test_ocr.json','w') as store_test:
+                            store_base.write(json.dumps(ocr_base))
+                            store_test.write(json.dumps(ocr_test))
+                            update_errorlog("[%s] insert success. \n" % (get_now_time()))
 
-                    test_issuccess = ocr_test['success']
-                    base_issuccess = ocr_base['success']
+                        test_issuccess = ocr_test['success']
+                        base_issuccess = ocr_base['success']
 
-                    if (test_issuccess == int(1) & base_issuccess == int(1)):
-                        finished += 1
+                        if (test_issuccess == int(1) & base_issuccess == int(1)):
+                            finished += 1
 
-                        # 计算距离
-                        distance_data = json.loads(ReturnRes(ocr_test, ocr_base))
+                            # 计算距离
+                            distance_data = json.loads(ReturnRes(ocr_test, ocr_base))
 
-                        if distance_data['img_diff_count'] != int(0):
-                            img_diff_count += 1
+                            if distance_data['img_diff_count'] != int(0):
+                                img_diff_count += 1
 
-                        text_diff_count += distance_data['text_diff_count']
-                        text_base_count += distance_data['text_base_count']
+                            text_diff_count += distance_data['text_diff_count']
+                            text_base_count += distance_data['text_base_count']
 
-                        rankInfo = distance_data['sum_distance']
-                        result = json.dumps(distance_data['result'])
+                            rankInfo = distance_data['sum_distance']
+                            result = json.dumps(distance_data['result'])
 
-                        test_Img1, testpath = post_image(lang, from_langs, to_langs, base64image, url_pic_test,
-                                                         filename, 'test', isStorePathExists, storePath)
-                        test_Img2, basepath = post_image(lang, from_langs, to_langs, base64image, url_pic_base,
-                                                         filename, 'base', isStorePathExists, storePath)
+                            test_Img1, testpath = post_image(lang, from_langs, to_langs, base64image, url_pic_test,
+                                                             filename, 'test', isStorePathExists, storePath)
+                            test_Img2, basepath = post_image(lang, from_langs, to_langs, base64image, url_pic_base,
+                                                             filename, 'base', isStorePathExists, storePath)
 
-                        insert_resultInfo(rankInfo, result, test_Img1, basepath, testpath, test_issuccess,
-                                          base_issuccess, filename)
-                        # sql_result = "INSERT INTO  %s(taskid_id,rankInfo,result,testImg,basepath,testpath,test_status,base_status,filename) values('%d','%d','%s','%s','%s','%s','%d','%d','%s')" % (
-                        #     database_result, mission_id, rankInfo, pymysql.escape_string(result), test_Img1, basepath,
-                        #     testpath, test_issuccess, base_issuccess, filename)
-                        #
-                        # cursor.execute(sql_result)
-                        # db.commit()
+                            insert_resultInfo(rankInfo, result, test_Img1, basepath, testpath, test_issuccess,
+                                              base_issuccess, filename)
+                            # sql_result = "INSERT INTO  %s(taskid_id,rankInfo,result,testImg,basepath,testpath,test_status,base_status,filename) values('%d','%d','%s','%s','%s','%s','%d','%d','%s')" % (
+                            #     database_result, mission_id, rankInfo, pymysql.escape_string(result), test_Img1, basepath,
+                            #     testpath, test_issuccess, base_issuccess, filename)
+                            #
+                            # cursor.execute(sql_result)
+                            # db.commit()
 
-                        update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count,text_base_count, path)
+                            update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count,text_base_count, path)
 
-                    else:
-                        failed += 1
-                        insert_resultInfo(rankInfo=0, result='null', test_Img1=origin_secpath + from_langs + '/' + filename, basepath='null', testpath='null', test_issuccess=0,
-                                      base_issuccess=0, filename=filename)
+                        else:
+                            failed += 1
+                            insert_resultInfo(rankInfo=0, result='null', test_Img1=origin_secpath + from_langs + '/' + filename, basepath='null', testpath='null', test_issuccess=0,
+                                          base_issuccess=0, filename=filename)
 
-                # path = rootpath + dest_secpath + str(mission_id)
-                # sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d',status=4 ,path='%s' where id=%d" % (
-                #     database_image, get_now_time(), sum_num, finished, failed, img_diff_count, text_diff_count,
-                #     text_base_count, path,
-                #     mission_id)
-                #
-                # cursor.execute(sql_image)
-                # db.commit()
-                set_endStatus(4)
+                    # path = rootpath + dest_secpath + str(mission_id)
+                    # sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d',status=4 ,path='%s' where id=%d" % (
+                    #     database_image, get_now_time(), sum_num, finished, failed, img_diff_count, text_diff_count,
+                    #     text_base_count, path,
+                    #     mission_id)
+                    #
+                    # cursor.execute(sql_image)
+                    # db.commit()
+                    set_endStatus(4)
 
-                status_data = get_imagetaskinfo()
-                if status_data[3] == 4:
-                    update_errorlog("[%s] Env deploy: The post [%s] has been completed. \n" % (get_now_time(), lang))
-                    continue
+                    status_data = get_imagetaskinfo()
+                    if status_data[3] == 4:
+                        update_errorlog("[%s] Env deploy: The post [%s] has been completed. \n" % (get_now_time(), lang))
+                        continue
 
-            else:
-                update_errorlog("[%s] Switch Language [%s] failed. \n" % (get_now_time(), lang))
-                set_endStatus(3)
+                else:
+                    update_errorlog("[%s] Switch Language [%s] failed. \n" % (get_now_time(), lang))
+                    set_endStatus(3)
 
+        else:
+            update_errorlog("[%s] SSH: lauch environment failed. \n" % (get_now_time()))
+            set_endStatus(3)
     else:
-        update_errorlog("[%s] SSH: lauch environment failed. \n" % (get_now_time()))
+        update_errorlog("[%s] SSH: The environment dont return [env_success]. \n" % (get_now_time()))
         set_endStatus(3)
     return 0
 
