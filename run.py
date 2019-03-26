@@ -90,7 +90,7 @@ def set_endStatus(status):
 
 
 def get_imagetaskinfo():
-    sql = "SELECT svIp, pid, langs, env_type, status FROM %s where id='%d'" % (database_image, mission_id)
+    sql = "SELECT svIp, langs, env_type, status FROM %s where id='%d'" % (database_image, mission_id)
     cursor.execute(sql)
     data = cursor.fetchone()
     try:
