@@ -90,7 +90,7 @@ def set_endStatus(status):
 
 
 def get_imagetaskinfo():
-    sql = "SELECT svIp, langs, env_type, status FROM %s where id='%d'" % (database_image, mission_id)
+    sql = "SELECT svIp, pid, langs, env_type, status FROM %s where id='%d'" % (database_image, mission_id)
     cursor.execute(sql)
     data = cursor.fetchone()
     try:
@@ -267,9 +267,11 @@ def post_ocr():
 
             else:
                 update_errorlog("[%s] Switch Language [%s] failed. \n" % (get_now_time(), lang))
+                set_endStatus(3)
 
     else:
         update_errorlog("[%s] SSH: lauch environment failed. \n" % (get_now_time()))
+        set_endStatus(3)
     return 0
 
 
