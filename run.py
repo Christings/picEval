@@ -206,7 +206,7 @@ def post_ocr():
                     if not os.path.exists(isStorePathExists):
                         os.makedirs(isStorePathExists)
 
-                    with open(isStorePathExists + 'base.json', 'w') as store_base, open(isStorePathExists + 'test.json','w') as store_test:
+                    with open(isStorePathExists + 'base_ocr.json', 'w') as store_base, open(isStorePathExists + 'test_ocr.json','w') as store_test:
                         store_base.write(json.dumps(ocr_base))
                         store_test.write(json.dumps(ocr_test))
                         update_errorlog("[%s] insert success. \n" % (get_now_time()))
