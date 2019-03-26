@@ -247,7 +247,7 @@ def post_ocr():
 
                     else:
                         failed += 1
-                        insert_resultInfo(rankInfo=0, result='', test_Img1=origin_secpath + from_langs + '/' + filename, basepath='null', testpath='null', test_issuccess=0,
+                        insert_resultInfo(rankInfo=0, result='null', test_Img1=origin_secpath + from_langs + '/' + filename, basepath='null', testpath='null', test_issuccess=0,
                                       base_issuccess=0, filename=filename)
 
                 # path = rootpath + dest_secpath + str(mission_id)
