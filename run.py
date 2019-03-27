@@ -90,7 +90,7 @@ def set_endStatus(status):
 
 
 def get_imagetaskinfo():
-    sql = "SELECT svIp, langs, env_type, status FROM %s where id='%d'" % (database_image, mission_id)
+    sql = "SELECT svIp, langs, env_type, status ,svPath FROM %s where id='%d'" % (database_image, mission_id)
     cursor.execute(sql)
     data = cursor.fetchone()
     try:
@@ -150,12 +150,16 @@ def post_ocr():
     langs = db_data[1]
     env_type = db_data[2]
     status = db_data[3]
+    svPath=db_data[4]
 
     remote_path = '/search/odin/test/gongyanli/picEval/'
+
+    update_errorlog("[%s] send parameters: [%s]. \n" % (get_now_time(),svPath))
 
     # ssh登录，启动环境
     cmds_base1 = "python " + remote_path + "%s %d" % ('start.py', mission_id)
     out1, err1 = lauch.startsh(ip, user, pwd, cmds_base1)
+
     if out1:
         out1 = out1[-1].strip('\n').strip("'")
 
