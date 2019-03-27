@@ -156,8 +156,6 @@ def post_ocr():
     # ssh登录，启动环境
     cmds_base1 = "python " + remote_path + "%s %d" % ('start.py', mission_id)
     out1, err1 = lauch.startsh(ip, user, pwd, cmds_base1)
-    print(out1)
-    print(err1)
     if out1:
         out1 = out1[-1].strip('\n').strip("'")
 
