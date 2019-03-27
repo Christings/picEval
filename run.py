@@ -154,7 +154,9 @@ def post_ocr():
 
     remote_path = '/search/odin/test/gongyanli/picEval/'
 
-    update_errorlog("[%s] send parameters: [%s]. \n" % (get_now_time(),svPath))
+    parameters=json.loads(svPath)
+    for k,v in parameters.items():
+        update_errorlog("[%s] send parameters: [%s]---[%s]. \n" % (get_now_time(),k,v))
 
     # ssh登录，启动环境
     cmds_base1 = "python " + remote_path + "%s %d" % ('start.py', mission_id)
