@@ -102,8 +102,8 @@ def get_imagetaskinfo():
     return data
 
 def update_imageTaskInfo(sum_num,finished,failed,img_diff_count,text_diff_count,text_base_count,path):
-    sql_image = "UPDATE %s set end_time='%s', sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d' ,path='%s' where id=%d" % (
-        database_image, get_now_time(), sum_num, finished, failed, img_diff_count, text_diff_count,text_base_count, path,mission_id)
+    sql_image = "UPDATE %s set sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d' ,path='%s' where id=%d" % (
+        database_image, sum_num, finished, failed, img_diff_count, text_diff_count,text_base_count, path,mission_id)
 
     try:
         cursor.execute(sql_image)
@@ -111,6 +111,8 @@ def update_imageTaskInfo(sum_num,finished,failed,img_diff_count,text_diff_count,
     except Exception as e:
         pass
     return 0
+
+
 
 def insert_resultInfo(rankInfo,result,test_Img1,basepath,testpath,test_issuccess,base_issuccess,filename):
     sql_result = "INSERT INTO  %s(taskid_id,rankInfo,result,testImg,basepath,testpath,test_status,base_status,filename) values('%d','%d','%s','%s','%s','%s','%d','%d','%s')" % (
