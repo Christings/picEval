@@ -195,15 +195,15 @@ def post_ocr():
                     update_errorlog("[%s] Env Deploy: The post is running. \n" % (get_now_time()))
 
                     path = rootpath + dest_secpath + str(mission_id)
-                    for filename in os.listdir(rootpath + origin_secpath + from_langs + '/'):
+                    # for filename in os.listdir(rootpath + origin_secpath + from_langs + '/'):
 
-                        p = Pool(10)
-                        for i in range(11):
-                            p.apply_async(real_post, args=(i,filename, from_langs, to_langs, langs, finished, sum_num, failed, lang, path))
-                        print('Waiting for all subprocesses done.')
-                        p.close()
-                        p.join()
-                        print('All subprocesses done.')
+                    p = Pool(10)
+                    for i in range(11):
+                        p.apply_async(real_post, args=(i, from_langs, to_langs, langs, finished, sum_num, failed, lang, path))
+                    print('Waiting for all subprocesses done.')
+                    p.close()
+                    p.join()
+                    print('All subprocesses done.')
 
                         # real_post(filename, from_langs, to_langs, langs, finished, sum_num, failed, lang, path)
 
@@ -298,7 +298,8 @@ def post_ocr():
 
     return 0
 
-def real_post(name,filename,from_langs,to_langs,langs,finished,sum_num,failed,lang,path):
+def real_post(name,from_langs,to_langs,langs,finished,sum_num,failed,lang,path):
+
     update_errorlog("[%s] pid:[%s]. \n" % (get_now_time(), os.getpid()))
 
     start = time.time()
@@ -310,68 +311,69 @@ def real_post(name,filename,from_langs,to_langs,langs,finished,sum_num,failed,la
     img_diff_count = 0
     text_diff_count = 0
     text_base_count = 0
+    for filename in os.listdir(rootpath + origin_secpath + from_langs + '/'):
 
-    isStorePathExists = rootpath + dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
-    storePath = dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
-    update_errorlog("[%s] path [%s] [%s]. \n" % (get_now_time(), isStorePathExists, storePath))
+        isStorePathExists = rootpath + dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
+        storePath = dest_secpath + str(mission_id) + '/' + langs + '/' + filename + '/'
+        update_errorlog("[%s] path [%s] [%s]. \n" % (get_now_time(), isStorePathExists, storePath))
 
-    base64image = imageTobase64(rootpath + origin_secpath + from_langs + '/' + filename)
-    params_ocr = {
-        'lang': from_langs,
-        'image': base64image,
-        'direction_detect': 'true'
-    }
-    resp_test = requests.post(url_ocr_test, data=params_ocr, headers=headers)
-    resp_base = requests.post(url_ocr_base, data=params_ocr, headers=headers)
+        base64image = imageTobase64(rootpath + origin_secpath + from_langs + '/' + filename)
+        params_ocr = {
+            'lang': from_langs,
+            'image': base64image,
+            'direction_detect': 'true'
+        }
+        resp_test = requests.post(url_ocr_test, data=params_ocr, headers=headers)
+        resp_base = requests.post(url_ocr_base, data=params_ocr, headers=headers)
 
-    ocr_test = resp_test.json()
-    ocr_base = resp_base.json()
+        ocr_test = resp_test.json()
+        ocr_base = resp_base.json()
 
-    if not os.path.exists(isStorePathExists):
-        os.makedirs(isStorePathExists)
+        if not os.path.exists(isStorePathExists):
+            os.makedirs(isStorePathExists)
 
-    with open(isStorePathExists + 'base_ocr.json', 'w') as store_base, open(isStorePathExists + 'test_ocr.json',
-                                                                            'w') as store_test:
-        store_base.write(json.dumps(ocr_base))
-        store_test.write(json.dumps(ocr_test))
-        update_errorlog("[%s] insert success. \n" % (get_now_time()))
+        with open(isStorePathExists + 'base_ocr.json', 'w') as store_base, open(isStorePathExists + 'test_ocr.json',
+                                                                                'w') as store_test:
+            store_base.write(json.dumps(ocr_base))
+            store_test.write(json.dumps(ocr_test))
+            update_errorlog("[%s] insert success. \n" % (get_now_time()))
 
-    test_issuccess = ocr_test['success']
-    base_issuccess = ocr_base['success']
+        test_issuccess = ocr_test['success']
+        base_issuccess = ocr_base['success']
 
-    if (test_issuccess == int(1) & base_issuccess == int(1)):
-        finished += 1
+        if (test_issuccess == int(1) & base_issuccess == int(1)):
+            finished += 1
 
-        # 计算距离
-        distance_data = json.loads(ReturnRes(ocr_test, ocr_base))
+            # 计算距离
+            distance_data = json.loads(ReturnRes(ocr_test, ocr_base))
 
-        if distance_data['img_diff_count'] != int(0):
-            img_diff_count += 1
+            if distance_data['img_diff_count'] != int(0):
+                img_diff_count += 1
 
-        text_diff_count += distance_data['text_diff_count']
-        text_base_count += distance_data['text_base_count']
+            text_diff_count += distance_data['text_diff_count']
+            text_base_count += distance_data['text_base_count']
 
-        rankInfo = distance_data['sum_distance']
-        result = json.dumps(distance_data['result'])
+            rankInfo = distance_data['sum_distance']
+            result = json.dumps(distance_data['result'])
 
-        test_Img1, testpath = post_image(lang, from_langs, to_langs, base64image, url_pic_test,
-                                         filename, 'test', isStorePathExists, storePath)
-        test_Img2, basepath = post_image(lang, from_langs, to_langs, base64image, url_pic_base,
-                                         filename, 'base', isStorePathExists, storePath)
+            test_Img1, testpath = post_image(lang, from_langs, to_langs, base64image, url_pic_test,
+                                             filename, 'test', isStorePathExists, storePath)
+            test_Img2, basepath = post_image(lang, from_langs, to_langs, base64image, url_pic_base,
+                                             filename, 'base', isStorePathExists, storePath)
 
-        insert_resultInfo(rankInfo, result, test_Img1, basepath, testpath, test_issuccess,base_issuccess, filename)
+            insert_resultInfo(rankInfo, result, test_Img1, basepath, testpath, test_issuccess,base_issuccess, filename)
 
-        update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count, text_base_count, path)
+            update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count, text_base_count, path)
 
-    else:
-        failed += 1
-        insert_resultInfo(rankInfo=0, result='null', test_Img1=origin_secpath + from_langs + '/' + filename,
-                          basepath='null', testpath='null', test_issuccess=0,
-                          base_issuccess=0, filename=filename)
+        else:
+            failed += 1
+            insert_resultInfo(rankInfo=0, result='null', test_Img1=origin_secpath + from_langs + '/' + filename,
+                              basepath='null', testpath='null', test_issuccess=0,
+                              base_issuccess=0, filename=filename)
 
-    end=time.time()
-    print('Task %s runs %0.2f seconds.' % (name, (end - start)))
-    update_errorlog("[%s] time:[%s]. \n" % (get_now_time(), end - start))
+        end=time.time()
+        print('Task %s runs %0.2f seconds.' % (name, (end - start)))
+        update_errorlog("[%s] time:[%s]. \n" % (get_now_time(), end - start))
 
 
 
