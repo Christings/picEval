@@ -135,11 +135,7 @@ def imageTobase64(path):
         return image
 
 
-def post_ocr(name):
-    print('Run task %s (%s)...' % (name, os.getpid()))
-    update_errorlog("[%s] pid:[%s]. \n" % (get_now_time(),os.getpid()))
-
-    start=time.time()
+def post_ocr():
 
     set_startStatus(2)
 
@@ -299,12 +295,14 @@ def post_ocr(name):
     else:
         update_errorlog("[%s] SSH: The environment dont return [env_success]. \n" % (get_now_time()))
         set_endStatus(3)
-    end=time.time()
-    print('Task %s runs %0.2f seconds.' % (name, (end - start)))
-    update_errorlog("[%s] time:[%s]. \n" % (get_now_time(),end-start))
+
     return 0
 
-def real_post(filename,from_langs,to_langs,langs,finished,sum_num,failed,lang,path):
+def real_post(name,filename,from_langs,to_langs,langs,finished,sum_num,failed,lang,path):
+    update_errorlog("[%s] pid:[%s]. \n" % (get_now_time(), os.getpid()))
+
+    start = time.time()
+    print('Run task %s (%s)...' % (name, os.getpid()))
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
     }
@@ -371,6 +369,10 @@ def real_post(filename,from_langs,to_langs,langs,finished,sum_num,failed,lang,pa
                           basepath='null', testpath='null', test_issuccess=0,
                           base_issuccess=0, filename=filename)
 
+    end=time.time()
+    print('Task %s runs %0.2f seconds.' % (name, (end - start)))
+    update_errorlog("[%s] time:[%s]. \n" % (get_now_time(), end - start))
+
 
 
 def post_image(lang, from_langs, to_langs, base64image, url, filename, type, isStorePathExists, storePath):
@@ -436,4 +438,3 @@ if __name__ == '__main__':
     pid=os.getpid()
     set_pid(pid)
     post_ocr()
-
