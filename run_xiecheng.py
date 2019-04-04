@@ -15,6 +15,8 @@ import writer
 from imgconf1 import *
 
 
+all=0
+
 
 # ocr接口：http://10.143.52.35:10098/v4/ocr/json
 # 参数：lang，image=base64串
@@ -102,25 +104,25 @@ def get_imagetaskinfo():
 
     return data
 
-async def update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count, text_base_count, path):
+def update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count, text_base_count, path):
     sql_image = "UPDATE %s set sum_num='%d',finished='%d',failed = '%d',img_diff_count='%d',text_diff_count = '%d',text_base_count = '%d' ,path='%s' where id=%d" % (
         database_image, sum_num, finished, failed, img_diff_count, text_diff_count, text_base_count, path, mission_id)
 
     try:
-        await cursor.execute(sql_image)
-        await db.commit()
+        cursor.execute(sql_image)
+        db.commit()
         print('插入成功！')
     except Exception as e:
         pass
     return 0
 
-async def insert_resultInfo(rankInfo,result,testImg,basepath,testpath,test_issuccess,base_issuccess,filename):
+def insert_resultInfo(rankInfo,result,testImg,basepath,testpath,test_issuccess,base_issuccess,filename):
     sql_result = "INSERT INTO  %s(taskid_id,rankInfo,result,testImg,basepath,testpath,test_status,base_status,filename) values('%d','%d','%s','%s','%s','%s','%d','%d','%s')" % (
                             database_result, mission_id, rankInfo, pymysql.escape_string(result), testImg, basepath,
                             testpath, test_issuccess, base_issuccess, filename)
     try:
-        await cursor.execute(sql_result)
-        await db.commit()
+        cursor.execute(sql_result)
+        db.commit()
     except Exception as e:
         pass
     return 0
@@ -225,7 +227,7 @@ async def get_img(from_langs, to_langs, base64image, isStorePathExists, storePat
 
 
 
-async def get_html(filename, finished, failed, from_langs, to_langs, langs, img_diff_count, text_diff_count,text_base_count):
+async def get_html(all,filename, finished, failed, from_langs, to_langs, langs, img_diff_count, text_diff_count,text_base_count):
     start=time.time()
     with(await sem):
         # async with是异步上下文管理器
@@ -268,6 +270,8 @@ async def get_html(filename, finished, failed, from_langs, to_langs, langs, img_
             base_issuccess = ocr_test['success']
 
             if (test_issuccess == int(1) & base_issuccess == int(1)):
+                all=all+1
+                print('all',all)
                 finished += 1
 
                 distance_data = json.loads(ReturnRes(ocr_test, ocr_base))
@@ -283,12 +287,12 @@ async def get_html(filename, finished, failed, from_langs, to_langs, langs, img_
 
                 basepath,testpath=await get_img(from_langs, to_langs, base64image, isStorePathExists, storePath)
 
-                await insert_resultInfo(rankInfo, result, testImg, basepath, testpath, test_issuccess,base_issuccess, filename)
+                insert_resultInfo(rankInfo, result, testImg, basepath, testpath, test_issuccess,base_issuccess, filename)
 
             else:
                 failed += 1
 
-                await insert_resultInfo(rankInfo=0, result='null', testImg=testImg, basepath='null', testpath='null', test_issuccess=0,base_issuccess=0, filename=filename)
+                insert_resultInfo(rankInfo=0, result='null', testImg=testImg, basepath='null', testpath='null', test_issuccess=0,base_issuccess=0, filename=filename)
 
             end=time.time()
             print('end-start:',end-start)
@@ -301,6 +305,8 @@ async def get_html(filename, finished, failed, from_langs, to_langs, langs, img_
 '''
 
 async def main_get_html():
+    global all
+
     sum_num = 0
 
     failed=0
@@ -327,7 +333,7 @@ async def main_get_html():
 
     # loop = asyncio.get_event_loop()           # 获取事件循环
 
-    tasks = [get_html(filename, finished, failed, from_langs, to_langs, langs, img_diff_count, text_diff_count,
+    tasks = [get_html(all,filename, finished, failed, from_langs, to_langs, langs, img_diff_count, text_diff_count,
                       text_base_count) for filename in
              os.listdir(rootpath + origin_secpath + from_langs + '/')]  # 把所有任务放到一个列表中
     # loop.run_until_complete(asyncio.wait(tasks)) # 激活协程
@@ -343,9 +349,9 @@ async def main_get_html():
 
         if (finished % 10) == 1:
             print('finish',finished)
-            await update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count, text_base_count, path)
+            update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count, text_base_count, path)
 
-    await update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count, text_base_count, path)
+    update_imageTaskInfo(sum_num, finished, failed, img_diff_count, text_diff_count, text_base_count, path)
     print('final and failed:',finished,failed)
 
     if sum_num==(finished+failed):
@@ -375,6 +381,7 @@ if __name__ == '__main__':
     set_pid(pid)
     # post_ocr()
     isLaunch = launch_env()
+    print(type(isLaunch))
     if isLaunch == int(1):
         get()
     else:
