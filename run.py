@@ -135,6 +135,45 @@ def imageTobase64(path):
         image = image.decode('utf-8')
         return image
 
+def rsyncTestData():
+    remote_path = '/search/odin/test/gongyanli/picEval/'
+
+    # ssh登录，rsync test data
+    cmds_base1 = "python " + remote_path + "%s %d" % ('sync_deploy_t.py',mission_id)
+    out1, err1 = lauch.startsh(ip, user, pwd, cmds_base1)
+
+    if out1:
+        out1 = out1[-1].strip('\n').strip("'")
+
+        if out1 == 'rsyncTestData_success':
+            update_errorlog("[%s] SSH: rsync test data successfully. \n" % (get_now_time()))
+
+            # ssh登录，rsync test lang data
+            cmds_base2 = "python " + remote_path + "%s %d" % ('lang_deploy_t.py',mission_id)
+            out2, err2 = lauch.startsh(ip, user, pwd, cmds_base2)
+
+            if out2:
+
+                out2 = out2[-1].strip('\n').strip("'")
+                if out2 == 'rsyncTestLangData_success':
+                    update_errorlog("[%s] SSH: rsync test lang data successfully. \n" % (get_now_time()))
+                    return 1
+                else:
+                    update_errorlog("[%s] SSH: rsync test lang data failed. \n" % (get_now_time()))
+                    set_endStatus(3)
+            else:
+                update_errorlog("[%s] SSH: The rsync (lang) dont return success status. \n" % (get_now_time()))
+                set_endStatus(3)
+
+        else:
+            update_errorlog("[%s] SSH: rsync test data failed. \n" % (get_now_time()))
+            set_endStatus(3)
+    else:
+        update_errorlog("[%s] SSH: The rsync (lib,conf) dont return success status. \n" % (get_now_time()))
+        set_endStatus(3)
+
+    return 0
+
 
 def launch_env():
     set_startStatus(2)
@@ -352,8 +391,12 @@ if __name__ == '__main__':
     # get_material()
     pid = os.getpid()
     set_pid(pid)
-    isLaunch = launch_env()
-    if isLaunch == int(1):
-        post_ocr()
+    isRsync=rsyncTestData()
+    if isRsync==int(1):
+        isLaunch = launch_env()
+        if isLaunch == int(1):
+            post_ocr()
+        else:
+            sys.exit(1)
     else:
-        sys.exit()
+        sys.exit(1)
