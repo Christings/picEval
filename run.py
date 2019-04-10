@@ -136,6 +136,8 @@ def imageTobase64(path):
         return image
 
 def rsyncTestData():
+    set_startStatus(2)
+
     remote_path = '/search/odin/test/gongyanli/picEval/'
 
     # ssh登录，rsync test data
@@ -145,7 +147,8 @@ def rsyncTestData():
     if out1:
         out1 = out1[-1].strip('\n').strip("'")
 
-        if out1 == 'rsyncTestData_success':
+        if out1 == 'env_success':
+        # if out1 == 'rsyncTestData_success':
             update_errorlog("[%s] SSH: rsync test data successfully. \n" % (get_now_time()))
 
             # ssh登录，rsync test lang data
@@ -155,7 +158,8 @@ def rsyncTestData():
             if out2:
 
                 out2 = out2[-1].strip('\n').strip("'")
-                if out2 == 'rsyncTestLangData_success':
+                if out2 == 'env_success':
+                # if out2 == 'rsyncTestLangData_success':
                     update_errorlog("[%s] SSH: rsync test lang data successfully. \n" % (get_now_time()))
                     return 1
                 else:
@@ -176,7 +180,6 @@ def rsyncTestData():
 
 
 def launch_env():
-    set_startStatus(2)
 
     db_data = get_imagetaskinfo()
     svIP = db_data[0]
