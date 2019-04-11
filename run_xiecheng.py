@@ -37,7 +37,7 @@ all=0
 db = pymysql.connect(database_host, database_user, database_pass, database_data)
 cursor = db.cursor()
 
-sem = asyncio.Semaphore(20)  # 信号量，控制协程数，防止抓取过快
+sem = asyncio.Semaphore(3)  # 信号量，控制协程数，防止抓取过快
 mission_id = int(sys.argv[1])
 url_ocr_test = "http://10.141.177.27:30000/v1/ocr/basic.json"
 url_pic_test = "http://10.141.177.27:3111/v1/ocr_translate.json"
@@ -185,7 +185,7 @@ def launch_env():
         update_errorlog("[%s] SSH: The environment dont return [env_success]. \n" % (get_now_time()))
         set_endStatus(3)
 
-    return 0
+    #return 0
 
 async def get_img(from_langs, to_langs, base64image, isStorePathExists, storePath):
     params_img = {
@@ -199,8 +199,8 @@ async def get_img(from_langs, to_langs, base64image, isStorePathExists, storePat
 
     # resp = requests.post('http://api.image.sogou/v1/open/ocr_translate.json', data=params_img)
     async with aiohttp.ClientSession() as session:
-        async with session.request('POST',url_pic_base,data=params_img) as resp_base,session.request('POST',url_pic_test,data=params_img) as resp_test:
-
+        async with session.request('POST',url_pic_base,data=params_img,timeout=500) as resp_base,session.request('POST',url_pic_test,data=params_img,timeout=800) as resp_test:
+            time.sleep(5)
             img_base = await resp_base.json(content_type=None)  # 直接获取到bytes
             img_test = await resp_test.json(content_type=None)  # 直接获取到bytes
 
@@ -256,9 +256,11 @@ async def get_html(all,filename, finished, failed, from_langs, to_langs, langs, 
             # resp_base = requests.post(url_ocr_base, data=params_ocr, headers=headers)
 
             async with session.request('POST', url_ocr_base, data=params_ocr,
-                                       headers=headers) as resp_base, session.request('POST', url_ocr_test,
+                                       headers=headers,timeout=500) as resp_base, session.request('POST', url_ocr_test,
                                                                                       data=params_ocr,
-                                                                                      headers=headers) as resp_test:  # 提出请求
+                                                                                      headers=headers,timeout=800) as resp_test:  # 提出请求
+
+                time.sleep(5)
                 ocr_base = await resp_base.json(content_type=None)  # 直接获取到bytes
                 ocr_test = await resp_test.json(content_type=None)  # 直接获取到bytes
                 # htmls.append(html)
@@ -297,6 +299,7 @@ async def get_html(all,filename, finished, failed, from_langs, to_langs, langs, 
             end=time.time()
             print('end-start:',end-start)
 
+            update_errorlog("[%s] Time: [%s] \n" % (get_now_time(), end-start))
             return finished, failed, img_diff_count, text_base_count, text_diff_count
 
 

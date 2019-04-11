@@ -64,7 +64,6 @@ def main():
             log_info.log_info('There is no task')
             continue
         ip = get_node(cursor)
-        print(ip)
         log_info.log_info('getnodeip' + ip)
         if ip is "":
             time.sleep(30)

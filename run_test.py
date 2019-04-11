@@ -198,8 +198,8 @@ def post_ocr():
                     # for filename in os.listdir(rootpath + origin_secpath + from_langs + '/'):
 
                     p = Pool(10)
-                    for i in range(11):
-                        p.apply_async(real_post, args=(i, from_langs, to_langs, langs, finished, sum_num, failed, lang, path))
+                    # for i in range(11):
+                    p.apply_async(real_post, args=(from_langs, to_langs, langs, finished, sum_num, failed, lang, path))
                     print('Waiting for all subprocesses done.')
                     p.close()
                     p.join()
@@ -298,12 +298,12 @@ def post_ocr():
 
     return 0
 
-def real_post(name,from_langs,to_langs,langs,finished,sum_num,failed,lang,path):
+def real_post(from_langs,to_langs,langs,finished,sum_num,failed,lang,path):
 
     update_errorlog("[%s] pid:[%s]. \n" % (get_now_time(), os.getpid()))
 
     start = time.time()
-    print('Run task %s (%s)...' % (name, os.getpid()))
+    #print('Run task %s (%s)...' % (name, os.getpid()))
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
     }
@@ -372,7 +372,7 @@ def real_post(name,from_langs,to_langs,langs,finished,sum_num,failed,lang,path):
                               base_issuccess=0, filename=filename)
 
         end=time.time()
-        print('Task %s runs %0.2f seconds.' % (name, (end - start)))
+        # print('Task %s runs %0.2f seconds.' % (name, (end - start)))
         update_errorlog("[%s] time:[%s]. \n" % (get_now_time(), end - start))
 
 

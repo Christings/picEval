@@ -137,7 +137,6 @@ def imageTobase64(path):
 
 def rsyncTestData():
     set_startStatus(2)
-
     remote_path = '/search/odin/test/gongyanli/picEval/'
 
     # ssh登录，rsync test data
